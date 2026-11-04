@@ -1,0 +1,87 @@
+name: backend
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: adcrm
+      POSTGRES_USER: adcrm
+      POSTGRES_PASSWORD: adcrm
+    ports:
+      - "5435:5432"
+    volumes:
+      - adcrm_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U adcrm -d adcrm"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  gotenberg:
+    image: gotenberg/gotenberg:8
+
+  backend:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+      gotenberg:
+        condition: service_started
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/adcrm
+      DB_USERNAME: adcrm
+      DB_PASSWORD: adcrm
+      JWT_SECRET_BASE64: ${JWT_SECRET_BASE64:-VGhpcy1pcy1hLWRlbW8tc2VjcmV0LWZvci1hZC1jcm0tYmFja2VuZC0yMDI2ISE=}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:5174,http://localhost:3000}
+      SUPER_ADMIN_EMAILS: ${SUPER_ADMIN_EMAILS:-egorchuiko7@gmail.com}
+      SUPER_ADMIN_NAME: ${SUPER_ADMIN_NAME:-Егор Чуйко}
+      SUPER_ADMIN_INITIAL_PASSWORD: ${SUPER_ADMIN_INITIAL_PASSWORD:-}
+      TRUST_PROXY_HEADERS: ${TRUST_PROXY_HEADERS:-false}
+      TRUSTED_PROXY_ADDRESSES: ${TRUSTED_PROXY_ADDRESSES:-127.0.0.1,::1}
+      RATE_LIMIT_LOGIN_ATTEMPTS: ${RATE_LIMIT_LOGIN_ATTEMPTS:-8}
+      RATE_LIMIT_REGISTER_ATTEMPTS: ${RATE_LIMIT_REGISTER_ATTEMPTS:-4}
+      RATE_LIMIT_CODE_ATTEMPTS: ${RATE_LIMIT_CODE_ATTEMPTS:-10}
+      RATE_LIMIT_WINDOW_MINUTES: ${RATE_LIMIT_WINDOW_MINUTES:-15}
+      SUPER_ADMIN_2FA_ENABLED: ${SUPER_ADMIN_2FA_ENABLED:-true}
+      SUPER_ADMIN_2FA_TTL_MINUTES: ${SUPER_ADMIN_2FA_TTL_MINUTES:-10}
+      SUPER_ADMIN_2FA_MAX_ATTEMPTS: ${SUPER_ADMIN_2FA_MAX_ATTEMPTS:-5}
+      APP_TIME_ZONE: ${APP_TIME_ZONE:-Europe/Minsk}
+      GOOGLE_DRIVE_ENABLED: ${GOOGLE_DRIVE_ENABLED:-false}
+      GOOGLE_SERVICE_ACCOUNT_JSON: ${GOOGLE_SERVICE_ACCOUNT_JSON:-}
+      GOOGLE_DRIVE_ROOT_FOLDER_ID: ${GOOGLE_DRIVE_ROOT_FOLDER_ID:-}
+      NOTIFICATION_CHANNEL: ${NOTIFICATION_CHANNEL:-INTERNAL}
+      SEED_ENABLED: ${SEED_ENABLED:-false}
+      DOCUMENT_STORAGE_DIR: /app/data/documents
+      GOTENBERG_URL: http://gotenberg:3000
+      PDF_ENABLED: ${PDF_ENABLED:-true}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      EMAIL_VERIFICATION_ENABLED: ${EMAIL_VERIFICATION_ENABLED:-true}
+      EMAIL_VERIFICATION_TTL_MINUTES: ${EMAIL_VERIFICATION_TTL_MINUTES:-10}
+      EMAIL_VERIFICATION_RESEND_SECONDS: ${EMAIL_VERIFICATION_RESEND_SECONDS:-60}
+      EMAIL_VERIFICATION_MAX_ATTEMPTS: ${EMAIL_VERIFICATION_MAX_ATTEMPTS:-5}
+      STATIC_PLACEMENT_MINIMUM_DAYS: ${STATIC_PLACEMENT_MINIMUM_DAYS:-28}
+      STATIC_PLACEMENT_PREPARATION_DAYS: ${STATIC_PLACEMENT_PREPARATION_DAYS:-7}
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_STARTTLS_ENABLED: ${MAIL_STARTTLS_ENABLED:-true}
+      MAIL_STARTTLS_REQUIRED: ${MAIL_STARTTLS_REQUIRED:-true}
+      MAIL_SSL_ENABLED: ${MAIL_SSL_ENABLED:-false}
+      MAIL_CONNECTION_TIMEOUT: ${MAIL_CONNECTION_TIMEOUT:-10000}
+      MAIL_READ_TIMEOUT: ${MAIL_READ_TIMEOUT:-30000}
+      MAIL_WRITE_TIMEOUT: ${MAIL_WRITE_TIMEOUT:-30000}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      # Enable SMTP health checks once mail credentials are configured.
+      MANAGEMENT_HEALTH_MAIL_ENABLED: ${MAIL_HEALTH_ENABLED:-false}
+    ports:
+      - "8081:8080"
+    volumes:
+      - adcrm_documents:/app/data/documents
+
+volumes:
+  adcrm_pgdata:
+    # Fixed volume name: changing/unzipping the project folder no longer switches databases.
+    name: ${ADCRM_DB_VOLUME_NAME:-backend_adcrm_pgdata}
+  adcrm_documents:
+    name: ${ADCRM_DOCUMENTS_VOLUME_NAME:-backend_adcrm_documents}

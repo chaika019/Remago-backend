@@ -1,0 +1,18 @@
+package com.adrotation.crm.user.enums;
+
+public enum Permission {
+    VIEW_DASHBOARD,
+    VIEW_SCHEDULE,
+    EDIT_SHIFT,
+    EDIT_CALENDAR,
+    EDIT_CITIES,
+    VIEW_ALL_DEALS,
+    EDIT_ALL_DEALS,
+    EDIT_OWN_DEALS,
+    UPLOAD_PHOTO_REPORT,
+    VIEW_NOTIFICATIONS,
+    VIEW_DOCUMENTS,
+    EDIT_DOCUMENTS,
+    VIEW_ORGANIZATION_PROFILE,
+    MANAGE_USERS
+}
