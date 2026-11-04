@@ -1,0 +1,13 @@
+{
+  "cities": 32,
+  "shifts": 404,
+  "companies": 1340,
+  "deals": 2626,
+  "contacts": 724,
+  "issues": 2207,
+  "import_key": "outdoor-xlsx:f95983d808ed491e0070f39deab77f2d43a15495b4dcd064ba2d91cd28144a52",
+  "sha256": "f95983d808ed491e0070f39deab77f2d43a15495b4dcd064ba2d91cd28144a52",
+  "sheets": 75,
+  "exact_duplicate_activities": 3,
+  "limitations": "Неполные строки сохранены в истории компаний и исходной книге; неизвестные города не создавались без категории; документы по закрытым ссылкам не скачивались."
+}
